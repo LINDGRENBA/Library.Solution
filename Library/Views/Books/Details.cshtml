@@ -2,6 +2,7 @@
   Layout ="_Layout";
 }
 
+@using Library.Models;
 @model Library.Models.Book
 
 <h2>Book Details!</h2>
@@ -13,13 +14,10 @@
 <h3>Edition: @Model.Edition</h3>
 <h3>Publisher: @Model.Publisher</h3>
 <h3>Genre: @Model.Genre</h3>
-
-@if(@Model.Authors.Count == 1)
-{
-  <h3>Author:</h3>
-  @Html.ActionLink(author.Name, "Details", "Authors", new { id = author.AuthorId })
-} 
-else if (@Model.Authors.Count == 0)
+<br>
+<button class="btn btn-alert">@Html.ActionLink("Delete Book", "Delete", new { id = Model.BookId})</button>
+<br>
+@if(@Model.Authors.Count == 0)
 {
   <h3>This Book has no authors!</h3>
   @Html.ActionLink("Would you like to add one?", "AddAuthor", new {id = @Model.BookId })
@@ -28,9 +26,36 @@ else
 {
   <p>This book was written by: </p>
   <ul>
-  foreach(Author author in @Model.Authors)
+  @foreach(AuthorBook join in Model.Authors)
   {
-    <li>@Html.ActionLink(author.Name, "Details", "Authors", new { id = author.AuthorId })</li>
+    <li>@Html.ActionLink($"{join.Author.Name}", "Details", "Authors", new { id = join.Author.AuthorId })</li>
   }
   </ul>
+
+
 }
+@if((@ViewBag.CheckoutCount + @ViewBag.AvailableCount) == 0)
+{
+  <p>There are no copies of this book in circulation at this library!</p>
+}
+else 
+{
+<p>Copies of this book currently checked out: @ViewBag.CheckedOutCount</p>
+
+<p>Copies available: @ViewBag.AvailableCount</p>
+}
+<h3>Add Additional Copies?</h3>
+@using (Html.BeginForm("Create", "Copies", FormMethod.Post))
+{
+  @Html.HiddenFor(model => model.BookId)
+  @Html.Label("Copies to Add")
+  @Html.TextBox("Copies", "Enter number to add", new { @type = "number" } )
+  <button class="btn btn-info" type="submit">Add</button>
+}
+
+@using (Html.BeginForm("CheckOut", "Copies", new {BookId = Model.BookId}))
+{
+  <button class="btn btn-alert" type="submit">Check Out Book</button>
+}
+
+

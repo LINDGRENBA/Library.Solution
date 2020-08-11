@@ -2,9 +2,11 @@
   Layout = "_Layout";
 }
 
-@model Library.Models.Book
+@using Library.Models;
+@model Library.Models.Book;
 
 <h4>Edit this book: @Html.DisplayFor(model => model.Title)</h4>
+</hr>
 
 @using (Html.BeginForm())
 {
@@ -26,10 +28,9 @@
   @Html.EditorFor(model => model.Publisher, new { @class="form-control"})
 
   @Html.LabelFor(model => model.Genre)
-  @Html.EnumDropDownListFor(model => model.Genre, new { @class="form-control"})
-  @* @Html.DropDownList("Genre",
+  @Html.DropDownList("Genre",
                     new SelectList(Enum.GetValues(typeof(BookGenre))),
-                    new { @class = "form-control" }) *@
+                    new { @class = "form-control" })
   
   
   <button type="submit" class="btn btn-default">Save Changes</button>
