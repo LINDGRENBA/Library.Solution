@@ -1,6 +1,6 @@
 # _Library_
 
-#### _C# ASP.NET Core MVC and EF Core practice for Epicodus, 08.10.2020_
+#### _C# ASP.NET Core MVC, EF Core and Identity practice for Epicodus, 08.10.2020_
 
 #### By _**Brittany Lindgren, Peter Grimm, and Ian Scott**_
 
