@@ -80,12 +80,149 @@ To set up the database for this project, you can follow the steps below to impor
 
 ##### SQL SCHEMA QUERY
 ```
-CREATE DATABASE IF NOT EXISTS **_database_name_**; USE **_database_name_**;
+CREATE DATABASE IF NOT EXISTS library; USE library;
 DROP TABLE IF EXISTS `__efmigrationshistory`;
 
-.
-.
-.
+CREATE TABLE `__efmigrationshistory` (
+  `MigrationId` varchar(95) NOT NULL,
+  `ProductVersion` varchar(32) NOT NULL,
+  PRIMARY KEY (`MigrationId`)
+) 
+
+DROP TABLE IF EXISTS `aspnetroleclaims`;
+CREATE TABLE `aspnetroleclaims` (
+  `Id` int NOT NULL AUTO_INCREMENT,
+  `RoleId` varchar(255) NOT NULL,
+  `ClaimType` longtext,
+  `ClaimValue` longtext,
+  PRIMARY KEY (`Id`),
+  KEY `IX_AspNetRoleClaims_RoleId` (`RoleId`),
+  CONSTRAINT `FK_AspNetRoleClaims_AspNetRoles_RoleId` FOREIGN KEY (`RoleId`) REFERENCES `aspnetroles` (`Id`) ON DELETE CASCADE
+)
+
+DROP TABLE IF EXISTS `aspnetroles`;
+CREATE TABLE `aspnetroles` (
+  `Id` varchar(255) NOT NULL,
+  `Name` varchar(256) DEFAULT NULL,
+  `NormalizedName` varchar(256) DEFAULT NULL,
+  `ConcurrencyStamp` longtext,
+  PRIMARY KEY (`Id`),
+  UNIQUE KEY `RoleNameIndex` (`NormalizedName`)
+) 
+
+DROP TABLE IF EXISTS `aspnetuserclaims`;
+CREATE TABLE `aspnetuserclaims` (
+  `Id` int NOT NULL AUTO_INCREMENT,
+  `UserId` varchar(255) NOT NULL,
+  `ClaimType` longtext,
+  `ClaimValue` longtext,
+  PRIMARY KEY (`Id`),
+  KEY `IX_AspNetUserClaims_UserId` (`UserId`),
+  CONSTRAINT `FK_AspNetUserClaims_AspNetUsers_UserId` FOREIGN KEY (`UserId`) REFERENCES `aspnetusers` (`Id`) ON DELETE CASCADE
+)
+
+DROP TABLE IF EXISTS `aspnetuserlogins`;
+CREATE TABLE `aspnetuserlogins` (
+  `LoginProvider` varchar(255) NOT NULL,
+  `ProviderKey` varchar(255) NOT NULL,
+  `ProviderDisplayName` longtext,
+  `UserId` varchar(255) NOT NULL,
+  PRIMARY KEY (`LoginProvider`,`ProviderKey`),
+  KEY `IX_AspNetUserLogins_UserId` (`UserId`),
+  CONSTRAINT `FK_AspNetUserLogins_AspNetUsers_UserId` FOREIGN KEY (`UserId`) REFERENCES `aspnetusers` (`Id`) ON DELETE CASCADE
+) 
+
+DROP TABLE IF EXISTS `aspnetuserroles`;
+CREATE TABLE `aspnetuserroles` (
+  `UserId` varchar(255) NOT NULL,
+  `RoleId` varchar(255) NOT NULL,
+  PRIMARY KEY (`UserId`,`RoleId`),
+  KEY `IX_AspNetUserRoles_RoleId` (`RoleId`),
+  CONSTRAINT `FK_AspNetUserRoles_AspNetRoles_RoleId` FOREIGN KEY (`RoleId`) REFERENCES `aspnetroles` (`Id`) ON DELETE CASCADE,
+  CONSTRAINT `FK_AspNetUserRoles_AspNetUsers_UserId` FOREIGN KEY (`UserId`) REFERENCES `aspnetusers` (`Id`) ON DELETE CASCADE
+)
+
+DROP TABLE IF EXISTS `aspnetusers`;
+CREATE TABLE `aspnetusers` (
+  `Id` varchar(255) NOT NULL,
+  `UserName` varchar(256) DEFAULT NULL,
+  `NormalizedUserName` varchar(256) DEFAULT NULL,
+  `Email` varchar(256) DEFAULT NULL,
+  `NormalizedEmail` varchar(256) DEFAULT NULL,
+  `EmailConfirmed` bit(1) NOT NULL,
+  `PasswordHash` longtext,
+  `SecurityStamp` longtext,
+  `ConcurrencyStamp` longtext,
+  `PhoneNumber` longtext,
+  `PhoneNumberConfirmed` bit(1) NOT NULL,
+  `TwoFactorEnabled` bit(1) NOT NULL,
+  `LockoutEnd` datetime(6) DEFAULT NULL,
+  `LockoutEnabled` bit(1) NOT NULL,
+  `AccessFailedCount` int NOT NULL,
+  `UserRole` longtext,
+  PRIMARY KEY (`Id`),
+  UNIQUE KEY `UserNameIndex` (`NormalizedUserName`),
+  KEY `EmailIndex` (`NormalizedEmail`)
+) 
+
+DROP TABLE IF EXISTS `aspnetusertokens`;
+CREATE TABLE `aspnetusertokens` (
+  `UserId` varchar(255) NOT NULL,
+  `LoginProvider` varchar(255) NOT NULL,
+  `Name` varchar(255) NOT NULL,
+  `Value` longtext,
+  PRIMARY KEY (`UserId`,`LoginProvider`,`Name`),
+  CONSTRAINT `FK_AspNetUserTokens_AspNetUsers_UserId` FOREIGN KEY (`UserId`) REFERENCES `aspnetusers` (`Id`) ON DELETE CASCADE
+) 
+
+DROP TABLE IF EXISTS `authorbook`;
+CREATE TABLE `authorbook` (
+  `AuthorBookId` int NOT NULL AUTO_INCREMENT,
+  `AuthorId` int NOT NULL,
+  `BookId` int NOT NULL,
+  PRIMARY KEY (`AuthorBookId`),
+  KEY `IX_AuthorBook_AuthorId` (`AuthorId`),
+  KEY `IX_AuthorBook_BookId` (`BookId`),
+  CONSTRAINT `FK_AuthorBook_Authors_AuthorId` FOREIGN KEY (`AuthorId`) REFERENCES `authors` (`AuthorId`) ON DELETE CASCADE,
+  CONSTRAINT `FK_AuthorBook_Books_BookId` FOREIGN KEY (`BookId`) REFERENCES `books` (`BookId`) ON DELETE CASCADE
+) 
+
+DROP TABLE IF EXISTS `authors`;
+CREATE TABLE `authors` (
+  `AuthorId` int NOT NULL AUTO_INCREMENT,
+  `Name` longtext,
+  `DateOfBirth` datetime(6) NOT NULL,
+  `Bio` longtext,
+  PRIMARY KEY (`AuthorId`)
+) 
+
+DROP TABLE IF EXISTS `books`;
+CREATE TABLE `books` (
+  `BookId` int NOT NULL AUTO_INCREMENT,
+  `Title` longtext,
+  `PublicationDate` datetime(6) NOT NULL,
+  `Description` longtext,
+  `Edition` longtext,
+  `DeweyDecimalNum` longtext,
+  `Publisher` longtext,
+  `Genre` int NOT NULL,
+  PRIMARY KEY (`BookId`)
+) 
+
+DROP TABLE IF EXISTS `copies`;
+CREATE TABLE `copies` (
+  `CopyId` int NOT NULL AUTO_INCREMENT,
+  `CheckoutDate` datetime(6) NOT NULL,
+  `DueDate` datetime(6) NOT NULL,
+  `IsCheckedOut` bit(1) NOT NULL,
+  `BookId` int NOT NULL,
+  `UserId` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`CopyId`),
+  KEY `IX_Copies_BookId` (`BookId`),
+  KEY `IX_Copies_UserId` (`UserId`),
+  CONSTRAINT `FK_Copies_AspNetUsers_UserId` FOREIGN KEY (`UserId`) REFERENCES `aspnetusers` (`Id`) ON DELETE RESTRICT,
+  CONSTRAINT `FK_Copies_Books_BookId` FOREIGN KEY (`BookId`) REFERENCES `books` (`BookId`) ON DELETE CASCADE
+)
 
 ```
 
